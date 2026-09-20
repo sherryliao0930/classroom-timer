@@ -9,7 +9,7 @@
   :root{
     --paper:#F6F0E6; --paper2:#EFE7D8;
     --ink:#2B2622; --ink-soft:#6E6259;
-    --red:#A61B22; --red-deep:#8A161C;
+    --red:#A61B22; --red-deep:#8A161C; --red-rgb:166,27,34; --red-dim:#3B080D;
     --rule:#D6C9B4;
     --serif:"Noto Serif TC","Source Han Serif TC","Songti TC","PMingLiU","MingLiU",serif;
     --numfont:"Cambria","Times New Roman","Noto Serif TC",serif;
@@ -18,7 +18,7 @@
   html[data-theme="dark"]{
     --paper:#221E1A; --paper2:#2A241F;
     --ink:#F4EEE3; --ink-soft:#B3A899;
-    --red:#D2434A; --red-deep:#B8323A;
+    --red:#D2434A; --red-deep:#B8323A; --red-rgb:210,67,74; --red-dim:#6B2126;
     --rule:#4A4137;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
@@ -76,19 +76,20 @@
   body.danger .stage{background:var(--red)}
   body.danger .colon i{background:#F6F0E6}
   body.danger .caption{color:var(--red)}
-  /* 閃動：底色與字色同時換，三個動畫一起啟動所以會同步 */
-  @keyframes flashBg {0%,49.9%{background:transparent}50%,100%{background:var(--red)}}
-  @keyframes flashNum{0%,49.9%{color:var(--red)}     50%,100%{color:#F6F0E6}}
-  @keyframes flashDot{0%,49.9%{background:var(--red)}50%,100%{background:#F6F0E6}}
-  body.flash .stage  {animation:flashBg  2s steps(1,end) infinite}
-  body.flash .tile   {animation:flashNum 2s steps(1,end) infinite}
-  body.flash .colon i{animation:flashDot 2s steps(1,end) infinite}
-  /* 最後 10 秒只稍微快一點點：看得出升溫，但不會刺眼 */
-  body.flash.danger .stage,
-  body.flash.danger .tile,
-  body.flash.danger .colon i{animation-duration:1.5s}
+  /* 呼吸：紅塊由亮漸暗、再漸漸亮回來。
+     字一律維持奶油色 —— 若讓底色與字色同時往中間漸變，兩者會在半途撞成同一個顏色，數字會整個消失。 */
+  body.flash{--num-color:#F6F0E6}
+  body.flash .colon i{background:#F6F0E6}
+  @keyframes pulseGlow{
+    0%,12%  {background-color:var(--red)}
+    46%,58% {background-color:var(--red-dim)}
+    88%,100%{background-color:var(--red)}
+  }
+  body.flash .stage{animation:pulseGlow 3s ease-in-out infinite}
+  /* 最後 10 秒呼吸得快一點：看得出升溫，但一樣是漸進的 */
+  body.flash.danger .stage{animation-duration:2s}
   @media (prefers-reduced-motion:reduce){
-    body.flash .stage, body.flash .tile, body.flash .colon i{animation:none}
+    body.flash .stage{animation:none; background:var(--red)}
   }
 
   /* ---------- 控制列 ---------- */
@@ -135,8 +136,12 @@
 
   /* ---------- 時間到 ---------- */
   #over{position:fixed; inset:0; z-index:100; display:none; flex-direction:column; align-items:center; justify-content:center;
-        background:var(--red); animation:alt 1.6s steps(1,end) infinite}
-  @keyframes alt{50%{background:#2B2622}}
+        background:var(--red); animation:alt 2.4s ease-in-out infinite}
+  @keyframes alt{
+    0%,12%  {background-color:#A61B22}
+    50%,62% {background-color:#3A0A0E}
+    88%,100%{background-color:#A61B22}
+  }
   #over.on{display:flex}
   #over .bar{width:min(70vw,760px); height:2px; background:#F6F0E6; opacity:.9}
   #over h1{margin:26px 0 18px; font-size:clamp(64px,15vw,260px); font-weight:700; color:#F6F0E6;
